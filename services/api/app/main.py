@@ -32,7 +32,7 @@ def get_db():
 def root():
     return {
         "app_name": "platform",
-        "environment": os.getenv("ENVIRONMENT"),
+        "environment": os.getenv("APP_ENV"),
         "status": "running"
     }
 
