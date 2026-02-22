@@ -1,7 +1,19 @@
 services:
   api:
+    env_file:
+      - .env.dev
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     volumes:
       - ./services/api:/app
     environment:
       ENVIRONMENT: development
+
+  postgres:
+    env_file:
+      - .env.dev
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "platform_user", "-d", "platform_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
