@@ -1,12 +1,16 @@
 # Python
 __pycache__/
 *.pyc
-
-# Environment files
+*.pyo
+*.pyd
 .env
+
+# Virtualenv
+venv/
 
 # Docker
 *.log
+docker-data/
 
 # IDE
 .vscode/
