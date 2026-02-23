@@ -1,7 +1,7 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy import text
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 import psycopg2
 import redis
@@ -9,11 +9,19 @@ import redis
 from app.database import engine, SessionLocal
 from app.models import Base, User
 
-# Create FastAPI instance
-app = FastAPI()
 
-# Create tables automatically (development only)
-Base.metadata.create_all(bind=engine)
+# -----------------------------
+# Lifespan (startup / shutdown)
+# -----------------------------
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    if os.getenv("APP_ENV") == "development":
+        Base.metadata.create_all(bind=engine)
+    yield
+
+
+# Create FastAPI instance
+app = FastAPI(lifespan=lifespan)
 
 
 # Dependency to get DB session
@@ -31,7 +39,7 @@ def get_db():
 @app.get("/")
 def root():
     return {
-        "app_name": "platform",
+        "app_name": os.getenv("APP_NAME", "platform"),
         "environment": os.getenv("APP_ENV"),
         "status": "running"
     }
@@ -77,7 +85,7 @@ def health():
         "status": overall_status,
         "database": db_status,
         "redis": redis_status,
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
 
