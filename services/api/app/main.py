@@ -1,4 +1,6 @@
 from contextlib import asynccontextmanager
+import asyncio
+from fastapi import HTTPException
 from fastapi import FastAPI, Depends
 from prometheus_fastapi_instrumentator import Instrumentator
 from sqlalchemy.orm import Session
@@ -138,3 +140,19 @@ def list_users(db: Session = Depends(get_db)):
         }
         for user in users
     ]
+
+# -----------------------------
+# Chaos / Testing endpoints
+# -----------------------------
+@app.get("/slow")
+async def slow_endpoint():
+    """Simulates a slow database query or degraded API (sleeps for 3 seconds)"""
+    logger.warning("Slow endpoint triggered! Sleeping for 3 seconds...")
+    await asyncio.sleep(3)
+    return {"message": "That took a while!"}
+@app.get("/crash")
+def crash_endpoint():
+    """Simulates a massive failure (throws 500 Internal Server Error)"""
+    logger.error("Crash endpoint triggered! Throwing an exception...")
+    raise HTTPException(status_code=500, detail="Intentional chaos triggered!")
+
