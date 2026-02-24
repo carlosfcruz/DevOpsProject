@@ -1,13 +1,31 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends
+from prometheus_fastapi_instrumentator import Instrumentator
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 import os
 import psycopg2
 import redis
+import logging
+from pythonjsonlogger import jsonlogger
 
 from app.database import engine, SessionLocal
 from app.models import Base, User
+
+
+# -----------------------------
+# Logging
+# -----------------------------
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+for handler in logger.handlers:
+    logger.removeHandler(handler)
+
+logHandler = logging.StreamHandler()
+formatter = jsonlogger.JsonFormatter('%(asctime)s %(levelname)s %(name)s %(message)s')
+logHandler.setFormatter(formatter)
+logger.addHandler(logHandler)
 
 
 # -----------------------------
@@ -19,10 +37,9 @@ async def lifespan(app: FastAPI):
         Base.metadata.create_all(bind=engine)
     yield
 
-
 # Create FastAPI instance
 app = FastAPI(lifespan=lifespan)
-
+Instrumentator().instrument(app).expose(app)
 
 # Dependency to get DB session
 def get_db():
@@ -80,6 +97,11 @@ def health():
     redis_status = check_redis()
 
     overall_status = "ok" if db_status == "ok" and redis_status == "ok" else "degraded"
+    logger.info("Health check endpoint called", extra={
+        "database": db_status,
+        "redis": redis_status,
+        "status": overall_status
+    })
 
     return {
         "status": overall_status,

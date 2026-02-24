@@ -1,5 +1,7 @@
 fastapi
+prometheus-fastapi-instrumentator
 uvicorn
 psycopg2-binary
 redis
 sqlalchemy
+python-json-logger
