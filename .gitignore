@@ -20,3 +20,10 @@ docker-data/
 
 # OS
 .DS_Store
+
+# Kubernetes
+*.kubeconfig
+secrets.yaml
+
+# Helm
+platform-chart/charts/*.tgz
