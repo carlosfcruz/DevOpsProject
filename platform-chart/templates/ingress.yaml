@@ -4,9 +4,8 @@ kind: Ingress
 metadata:
   name: platform-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
-  ingressClassName: nginx
+  ingressClassName: traefik
   rules:
     - host: {{ .Values.ingress.host }}
       http:
