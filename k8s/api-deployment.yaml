@@ -17,16 +17,9 @@ spec:
           image: ghcr.io/carlosfcruz/devopsproject:latest
           ports:
             - containerPort: 8000
-          env:
-            - name: APP_NAME
-              value: "platform"
-            - name: APP_ENV
-              value: "development"
-            - name: POSTGRES_HOST
-              value: "postgres"
-            - name: REDIS_HOST
-              value: "redis"
           envFrom:
+            - configMapRef:
+                name: app-config
             - secretRef:
                 name: db-credentials
 ---

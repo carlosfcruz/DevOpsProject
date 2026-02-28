@@ -1,26 +1,33 @@
 # API Configuration
 api:
   replicas: 2
-  image: ghcr.io/carlosfcruz/devopsproject:latest
+  image:
+    repository: ghcr.io/carlosfcruz/devopsproject
+    tag: latest
   port: 8000
   env:
     APP_NAME: "platform"
     APP_ENV: "development"
     POSTGRES_HOST: "postgres"
     REDIS_HOST: "redis"
+
 # PostgreSQL Configuration
 postgres:
   image: postgres:16
   port: 5432
   storage: 1Gi
+
 # Redis Configuration
 redis:
   image: redis:7
   port: 6379
+
 # Ingress Configuration
 ingress:
   enabled: true
   host: platform.local
+  className: nginx
+
 # Secret reference
 secret:
   name: db-credentials
