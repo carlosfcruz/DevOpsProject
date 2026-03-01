@@ -22,20 +22,9 @@ spec:
                 name: app-config
             - secretRef:
                 name: {{ .Values.secret.name }}
-          containers:
-            - name: api
-              image: "{{ .Values.api.image.repository }}:{{ .Values.api.image.tag }}"
-              ports:
-                - containerPort: {{ .Values.api.port }}
-              envFrom:
-                - configMapRef:
-                    name: app-config
-                - secretRef:
-                    name: {{ .Values.secret.name }}
-              env:
-                - name: BUILD_SHA
-                  value: "{{ .Values.api.image.tag }}"
-
+          env:
+            - name: BUILD_SHA
+              value: "{{ .Values.api.image.tag }}"
 ---
 apiVersion: v1
 kind: Service
