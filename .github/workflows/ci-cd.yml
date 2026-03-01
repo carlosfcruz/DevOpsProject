@@ -1,17 +1,17 @@
 name: CI/CD Pipeline
-
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
+# ──────────────────────────────────────
+# Job 1: Run tests
+# ──────────────────────────────────────
 jobs:
-  # ──────────────────────────────────────
-  # Job 1: Run tests
-  # ──────────────────────────────────────
   test:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,12 +22,12 @@ jobs:
           python-version: "3.13"
 
       - name: Install dependencies
-        run: pip install -r requirements.dev.txt
         working-directory: services/api
+        run: pip install -r requirements.dev.txt
 
       - name: Run tests
-        run: pytest tests/ -v
         working-directory: services/api
+        run: pytest tests/ -v
 
   # ──────────────────────────────────────
   # Job 2: Build image & push to GHCR
@@ -36,6 +36,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+
     permissions:
       contents: read
       packages: write
@@ -66,6 +67,7 @@ jobs:
   security-scan:
     needs: build-and-push
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
       packages: read
@@ -76,8 +78,25 @@ jobs:
         with:
           image-ref: ghcr.io/${{ github.repository_owner }}/devopsproject:${{ github.sha }}
           format: table
-          exit-code: 0
+          exit-code: 1
+          ignore-unfixed: true
           severity: CRITICAL,HIGH
+
+      - name: Run Trivy (SARIF report)
+        if: always()
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ghcr.io/${{ github.repository_owner }}/devopsproject:${{ github.sha }}
+          format: sarif
+          output: trivy-results.sarif
+          severity: CRITICAL,HIGH
+
+      - name: Upload Trivy scan results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-security-report
+          path: trivy-results.sarif
 
   # ──────────────────────────────────────
   # Job 4: Deploy to AWS EC2 (staging)
