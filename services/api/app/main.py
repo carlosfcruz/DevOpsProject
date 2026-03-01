@@ -142,6 +142,18 @@ def list_users(db: Session = Depends(get_db)):
     ]
 
 # -----------------------------
+# Version / build info
+# -----------------------------
+@app.get("/version")
+def version():
+    """Returns app version and build metadata — proves CI/CD deployed new code."""
+    return {
+        "version": "1.1.0",
+        "commit": os.getenv("BUILD_SHA", "dev"),
+        "environment": os.getenv("APP_ENV", "unknown"),
+    }
+
+# -----------------------------
 # Chaos / Testing endpoints
 # -----------------------------
 @app.get("/slow")
@@ -155,4 +167,3 @@ def crash_endpoint():
     """Simulates a massive failure (throws 500 Internal Server Error)"""
     logger.error("Crash endpoint triggered! Throwing an exception...")
     raise HTTPException(status_code=500, detail="Intentional chaos triggered!")
-

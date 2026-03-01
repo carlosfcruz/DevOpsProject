@@ -76,3 +76,12 @@ def test_list_users(client):
     response = client.get("/users")
     assert response.status_code == 200
     assert len(response.json()) >= 1
+
+
+def test_version_endpoint(client):
+    response = client.get("/version")
+    assert response.status_code == 200
+    data = response.json()
+    assert "version" in data
+    assert "commit" in data
+    assert data["version"] == "1.1.0"
