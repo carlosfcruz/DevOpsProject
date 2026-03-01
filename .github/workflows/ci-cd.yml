@@ -99,29 +99,31 @@ jobs:
           path: trivy-results.sarif
 
   # ──────────────────────────────────────
-  # Job 4: Deploy to AWS EC2 (staging)
+  # Job 4: Update Helm values (GitOps)
   # ──────────────────────────────────────
-  deploy:
+  update-tag:
     needs: [build-and-push, security-scan]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
 
     steps:
-      - name: Deploy to EC2 via SSH
-        uses: appleboy/ssh-action@v1
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            export KUBECONFIG=~/.kube/config
-            cd ~/DevOpsProject
-            git pull origin main
-            helm upgrade platform ./platform-chart \
-              --namespace platform-cloud \
-              --set api.image.tag=${{ github.sha }} \
-              --set api.replicas=1 \
-              --set ingress.host=${{ secrets.EC2_HOST }}.nip.io \
-              --set ingress.className=traefik
-            kubectl rollout status deploy/api -n platform-cloud --timeout=120s
-            echo "✅ Deployed commit ${{ github.sha }}"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update image tag in values.yaml
+        run: |
+          sed -i "s|tag:.*|tag: ${{ github.sha }}|" platform-chart/values.yaml
+          cat platform-chart/values.yaml | grep tag
+
+      - name: Commit and push updated tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add platform-chart/values.yaml
+          git diff --cached --quiet && echo "No changes" && exit 0
+          git commit -m "ci: update image tag to ${{ github.sha }} [skip ci]"
+          git push
