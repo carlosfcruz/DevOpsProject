@@ -49,6 +49,35 @@ body {
   padding: 2rem 1.5rem 3rem;
 }
 
+/* Environment banner */
+.env-banner {
+  text-align: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.env-banner--development {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--green);
+  border-bottom: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.env-banner--staging {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--amber);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.env-banner--production {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--red);
+  border-bottom: 1px solid rgba(239, 68, 68, 0.3);
+}
+
 /* Header */
 .header {
   text-align: center;

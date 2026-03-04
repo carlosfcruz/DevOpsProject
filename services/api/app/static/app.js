@@ -53,6 +53,19 @@ async function fetchStatus() {
         $('app-name').textContent = data.app.name;
         $('app-version').textContent = 'v' + data.app.version;
         $('app-env').textContent = data.app.environment;
+        var env = data.app.environment.toLowerCase();
+        var banner = $('env-banner');
+        banner.className = 'env-banner';
+        if (env === 'production') {
+            banner.textContent = '🚀 production environment';
+            banner.classList.add('env-banner--production');
+        } else if (env === 'staging') {
+            banner.textContent = '🧪 staging environment';
+            banner.classList.add('env-banner--staging');
+        } else {
+            banner.textContent = '🔧 development environment';
+            banner.classList.add('env-banner--development');
+        }
         $('app-commit').textContent = '🔗 ' + data.app.commit.substring(0, 7);
 
         currentUptime = data.app.uptime_seconds;
