@@ -85,3 +85,29 @@ def test_version_endpoint(client):
     assert "version" in data
     assert "commit" in data
     assert data["version"] == "1.1.0"
+
+
+def test_dashboard(client):
+    response = client.get("/dashboard")
+    assert response.status_code == 200
+    assert "<!DOCTYPE html>" in response.text
+
+
+def test_api_status(client):
+    response = client.get("/api/status")
+    assert response.status_code == 200
+    data = response.json()
+    assert "app" in data
+    assert "health" in data
+    assert "system" in data
+    assert "uptime_seconds" in data["app"]
+    assert data["app"]["version"] == "1.1.0"
+
+
+def test_api_stats(client):
+    response = client.get("/api/stats")
+    assert response.status_code == 200
+    data = response.json()
+    assert "user_count" in data
+    assert "redis_ping_ms" in data
+    assert data["user_count"] == 0

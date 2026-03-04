@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Platform Dashboard — OpsPilot</title>
+  <meta name="description" content="Real-time status dashboard for the OpsPilot platform application" />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- ========== HEADER ========== -->
+    <header class="header">
+      <h1 class="header__title">🚀 <span id="app-name">Platform</span> Dashboard</h1>
+      <div class="header__meta">
+        <span class="badge badge--version" id="app-version">v—</span>
+        <span class="badge badge--env" id="app-env">—</span>
+        <span class="badge badge--commit" id="app-commit">—</span>
+      </div>
+      <p class="header__uptime">Uptime: <strong id="uptime">—</strong></p>
+    </header>
+
+
+    <!-- ========== HEALTH STATUS ========== -->
+    <section class="grid grid--health">
+
+      <!-- Database -->
+      <div class="card" id="card-db">
+        <div class="card__header">
+          <span class="card__title">Database</span>
+          <span class="card__icon">🗄️</span>
+        </div>
+        <div class="health-status">
+          <span class="health-dot health-dot--loading" id="dot-db"></span>
+          <span class="health-label" id="health-db">checking…</span>
+        </div>
+      </div>
+
+      <!-- Redis -->
+      <div class="card" id="card-redis">
+        <div class="card__header">
+          <span class="card__title">Redis</span>
+          <span class="card__icon">⚡</span>
+        </div>
+        <div class="health-status">
+          <span class="health-dot health-dot--loading" id="dot-redis"></span>
+          <span class="health-label" id="health-redis">checking…</span>
+        </div>
+      </div>
+
+      <!-- Overall -->
+      <div class="card" id="card-overall">
+        <div class="card__header">
+          <span class="card__title">Overall</span>
+          <span class="card__icon">💚</span>
+        </div>
+        <div class="health-status">
+          <span class="health-dot health-dot--loading" id="dot-overall"></span>
+          <span class="health-label" id="health-overall">checking…</span>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ========== INFO + STATS ========== -->
+    <section class="grid grid--info">
+
+      <!-- System Info -->
+      <div class="card">
+        <div class="card__header">
+          <span class="card__title">System Info</span>
+          <span class="card__icon">🖥️</span>
+        </div>
+        <div>
+          <p class="data-value--small">Hostname</p>
+          <p class="data-value" id="sys-hostname"><span class="skeleton"></span></p>
+        </div>
+        <div style="margin-top: 0.75rem;">
+          <p class="data-value--small">Python</p>
+          <p class="data-value" id="sys-python"><span class="skeleton"></span></p>
+        </div>
+        <div style="margin-top: 0.75rem;">
+          <p class="data-value--small">Platform</p>
+          <p class="data-value--small" id="sys-platform"><span class="skeleton"></span></p>
+        </div>
+      </div>
+
+      <!-- Live Stats -->
+      <div class="card">
+        <div class="card__header">
+          <span class="card__title">Live Stats</span>
+          <span class="card__icon">📊</span>
+        </div>
+        <div>
+          <p class="data-value--small">Users in Database</p>
+          <p class="data-value" id="stat-users"><span class="skeleton"></span></p>
+        </div>
+        <div style="margin-top: 0.75rem;">
+          <p class="data-value--small">Redis Ping</p>
+          <p class="data-value" id="stat-redis-ping"><span class="skeleton"></span></p>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="footer">
+      <p>OpsPilot Platform Dashboard · Built with FastAPI</p>
+      <p class="footer__refresh">
+        <span class="dot"></span>
+        Auto-refreshing every 5s · Last updated: <span id="last-updated">—</span>
+      </p>
+    </footer>
+
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

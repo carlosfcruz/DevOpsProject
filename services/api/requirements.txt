@@ -5,3 +5,4 @@ psycopg2-binary
 redis
 sqlalchemy
 python-json-logger
+aiofiles
