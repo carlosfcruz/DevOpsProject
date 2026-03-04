@@ -7,7 +7,8 @@ api:
   port: 8000
   env:
     APP_NAME: "platform"
-    APP_ENV: "development"
+    APP_ENV: "staging"
+    LOG_LEVEL: "info"
     POSTGRES_HOST: "postgres"
     REDIS_HOST: "redis"
 
