@@ -40,7 +40,7 @@ logger.addHandler(logHandler)
 # -----------------------------
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    if os.getenv("APP_ENV") == "development":
+    if os.getenv("APP_ENV") in ("development", "staging"):
         Base.metadata.create_all(bind=engine)
     yield
 
