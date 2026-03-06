@@ -15,8 +15,13 @@ terraform {
     }
   }
 
-  # Local backend configured for initial stages.
-  # Migration to S3 remote backend planned for future.
+  backend "s3" {
+    bucket         = "platform-tfstate-bucket-cadu" # Replace if your bucket name differs
+    key            = "platform/terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "platform-tfstate-locks"
+    encrypt        = true
+  }
 }
 
 # ─────────────────────────────────────────────────────────
