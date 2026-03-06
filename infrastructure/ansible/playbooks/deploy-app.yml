@@ -1,0 +1,49 @@
+# ─────────────────────────────────────────────────────────
+# Playbook: Platform Application Deployment
+# ─────────────────────────────────────────────────────────
+# Configures application-specific resources (Namespaces,
+# Secrets) and deploys the ArgoCD Application manifest to
+# trigger the GitOps synchronization.
+# ─────────────────────────────────────────────────────────
+
+---
+- name: Deploy Platform Application via ArgoCD
+  hosts: app_servers
+  become: true
+
+  vars:
+    # Defining variables that will be injected into our Jinja2 template
+    github_repo_url: "https://github.com/carlosfcruz/DevOpsProject.git"
+    app_namespace: "platform-cloud"
+
+  tasks:
+    - name: Ensure application namespace exists
+      kubernetes.core.k8s:
+        name: "{{ app_namespace }}"
+        api_version: v1
+        kind: Namespace
+        state: present
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+
+    # In a production environment, secrets should be encrypted using Ansible Vault.
+    # We are using plaintext here for learning purposes.
+    - name: Create database credentials secret
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: db-credentials
+            namespace: "{{ app_namespace }}"
+          type: Opaque
+          stringData:
+            postgres-password: "supersecurepassword"
+            postgres-user: "platform"
+
+    - name: Deploy ArgoCD Application manifest from template
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+        template: 'templates/argocd-app.yml.j2'
