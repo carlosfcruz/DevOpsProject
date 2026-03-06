@@ -14,3 +14,9 @@ output "ssh_command" {
   description = "Constructed SSH connection command"
   value       = "ssh -i platform-key.pem ubuntu@${module.compute.public_ip}"
 }
+
+output "private_key_pem" {
+  description = "Private SSH key material (sensitive)"
+  value       = module.compute.private_key_pem
+  sensitive   = true
+}
