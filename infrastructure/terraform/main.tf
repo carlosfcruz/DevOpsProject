@@ -16,11 +16,11 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "platform-tfstate-bucket-cadu" # Replace if your bucket name differs
-    key            = "platform/terraform.tfstate"
-    region         = "us-east-1"
-    dynamodb_table = "platform-tfstate-locks"
-    encrypt        = true
+    bucket       = "platform-terraform-state-849265223774"
+    key          = "platform/terraform.tfstate"
+    region       = "us-east-1"
+    use_lockfile = true
+    encrypt      = true
   }
 }
 
