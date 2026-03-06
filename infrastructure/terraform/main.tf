@@ -29,13 +29,26 @@ terraform {
 #   3. EC2 instance profile (if running on AWS)
 # ─────────────────────────────────────────────────────────
 provider "aws" {
-  region = "us-east-1"
+  region = var.aws_region
 
   default_tags {
     tags = {
       Project     = "Platform"
       ManagedBy   = "Terraform"
-      Environment = "staging"
+      Environment = var.environment
     }
   }
+}
+
+# ─────────────────────────────────────────────────────────
+# Module: Networking
+# ─────────────────────────────────────────────────────────
+# Creates VPC, subnet, internet gateway, and security group.
+# Think of it as: "build the neighborhood before the house"
+# ─────────────────────────────────────────────────────────
+module "networking" {
+  source = "./modules/networking"
+
+  project_name = var.project_name
+  aws_region   = var.aws_region
 }
