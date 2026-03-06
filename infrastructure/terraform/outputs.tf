@@ -1,20 +1,16 @@
 # ─────────────────────────────────────────────────────────
-# Networking Module Outputs
+# Root Outputs
 # ─────────────────────────────────────────────────────────
-# Exports identifiers necessary for dependent module integration.
+# Consolidates module outputs and provides connection 
+# details upon successful execution.
 # ─────────────────────────────────────────────────────────
 
-output "vpc_id" {
-  description = "Identifier of the provisioned VPC"
-  value       = aws_vpc.main.id
+output "server_public_ip" {
+  description = "Public IP of the application server"
+  value       = module.compute.public_ip
 }
 
-output "public_subnet_id" {
-  description = "Identifier of the configured public subnet"
-  value       = aws_subnet.public.id
-}
-
-output "security_group_id" {
-  description = "Identifier of the main security group defining access rules"
-  value       = aws_security_group.main.id
+output "ssh_command" {
+  description = "Constructed SSH connection command"
+  value       = "ssh -i platform-key.pem ubuntu@${module.compute.public_ip}"
 }

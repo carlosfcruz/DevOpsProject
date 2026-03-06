@@ -1,18 +1,12 @@
 # ─────────────────────────────────────────────────────────
-# Networking Module — Main Resources
+# Networking Module
 # ─────────────────────────────────────────────────────────
-# Creates the entire network foundation for our EC2:
+# Establishes the foundational network architecture:
 #   VPC → Subnet → Internet Gateway → Route Table → Security Group
-#
-# ANALOGY: Think of this as building the "neighborhood"
-#   - VPC        = the city (isolated network)
-#   - Subnet     = a street in the city
-#   - IGW        = the highway on-ramp to the internet
-#   - Route Table = GPS directions ("to reach the internet, use the IGW")
-#   - Security Group = the firewall at your front door
 # ─────────────────────────────────────────────────────────
 
-# ───── VPC: your isolated private network in AWS ─────
+# ───── VPC ─────
+# Provisions an isolated virtual network environment.
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true
@@ -23,8 +17,8 @@ resource "aws_vpc" "main" {
   }
 }
 
-# ───── Public Subnet: where our EC2 will live ─────
-# "Public" means instances here CAN get a public IP
+# ───── Public Subnet ─────
+# Designates a network segment capable of assigning public IPs.
 resource "aws_subnet" "public" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = var.public_subnet_cidr
@@ -36,7 +30,8 @@ resource "aws_subnet" "public" {
   }
 }
 
-# ───── Internet Gateway: connects the VPC to the internet ─────
+# ───── Internet Gateway ─────
+# Enables communication between the VPC and the public internet.
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
@@ -45,7 +40,8 @@ resource "aws_internet_gateway" "main" {
   }
 }
 
-# ───── Route Table: "to reach 0.0.0.0/0, use the IGW" ─────
+# ───── Route Table ─────
+# Defines traffic routing rules; directs non-local traffic to the IGW.
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
@@ -59,66 +55,61 @@ resource "aws_route_table" "public" {
   }
 }
 
-# Link the route table to our subnet
+# Associates the public subnet with the public route table.
 resource "aws_route_table_association" "public" {
   subnet_id      = aws_subnet.public.id
   route_table_id = aws_route_table.public.id
 }
 
-# ───── Security Group: the firewall rules ─────
+# ───── Security Group ─────
+# Implements firewall rules for ingress and egress traffic filtering.
 resource "aws_security_group" "main" {
   name        = "${var.project_name}-sg"
-  description = "Security group for ${var.project_name} server"
+  description = "Primary security group for application access"
   vpc_id      = aws_vpc.main.id
 
-  # SSH access
   ingress {
-    description = "SSH"
+    description = "SSH Access"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # HTTP
   ingress {
-    description = "HTTP"
+    description = "HTTP Access"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # HTTPS
   ingress {
-    description = "HTTPS"
+    description = "HTTPS Access"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # K3s API server (kubectl access)
   ingress {
-    description = "K3s API"
+    description = "Kubernetes API Server (K3s)"
     from_port   = 6443
     to_port     = 6443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # NodePort range (for Kubernetes services)
   ingress {
-    description = "K8s NodePort range"
+    description = "Kubernetes NodePort Definition Range"
     from_port   = 30000
     to_port     = 32767
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # Allow ALL outbound traffic
   egress {
-    description = "All outbound"
+    description = "Unrestricted outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"

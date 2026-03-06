@@ -1,9 +1,8 @@
 # ─────────────────────────────────────────────────────────
 # Platform — Terraform Root Module
 # ─────────────────────────────────────────────────────────
-# This file is the entry point for all infrastructure.
-# Right now it only configures the AWS provider.
-# We'll add modules (networking, compute) in later sessions.
+# Entry point for infrastructure provisioning.
+# Configures the AWS provider and integrates modules.
 # ─────────────────────────────────────────────────────────
 
 terraform {
@@ -16,17 +15,16 @@ terraform {
     }
   }
 
-  # Session 1: local backend (state stored on disk)
-  # Session 6: we'll migrate this to S3 remote backend
+  # Local backend configured for initial stages.
+  # Migration to S3 remote backend planned for future.
 }
 
 # ─────────────────────────────────────────────────────────
-# Provider: tells Terraform HOW to talk to AWS
+# Provider Configuration
 # ─────────────────────────────────────────────────────────
-# It reads credentials from:
-#   1. Environment vars (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
-#   2. ~/.aws/credentials file (from `aws configure`)
-#   3. EC2 instance profile (if running on AWS)
+# Directs Terraform interactions with the AWS API.
+# Authentication relies on environment variables, local 
+# credentials file, or instance profiles.
 # ─────────────────────────────────────────────────────────
 provider "aws" {
   region = var.aws_region
@@ -41,14 +39,30 @@ provider "aws" {
 }
 
 # ─────────────────────────────────────────────────────────
-# Module: Networking
+# Networking Module
 # ─────────────────────────────────────────────────────────
-# Creates VPC, subnet, internet gateway, and security group.
-# Think of it as: "build the neighborhood before the house"
+# Provisions foundational network resources: VPC, subnet,
+# internet gateway, and security group.
 # ─────────────────────────────────────────────────────────
 module "networking" {
   source = "./modules/networking"
 
   project_name = var.project_name
   aws_region   = var.aws_region
+}
+
+# ─────────────────────────────────────────────────────────
+# Compute Module
+# ─────────────────────────────────────────────────────────
+# Provisions the core application server (EC2) and SSH keys.
+# Relies on network infrastructure attributes (subnet, security group)
+# exported by the networking module.
+# ─────────────────────────────────────────────────────────
+module "compute" {
+  source = "./modules/compute"
+
+  project_name      = var.project_name
+  instance_type     = var.instance_type
+  subnet_id         = module.networking.public_subnet_id
+  security_group_id = module.networking.security_group_id
 }

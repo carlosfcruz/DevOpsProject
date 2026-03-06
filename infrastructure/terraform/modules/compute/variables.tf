@@ -1,25 +1,24 @@
 # ─────────────────────────────────────────────────────────
-# Networking Module Variables
+# Compute Module Variables
 # ─────────────────────────────────────────────────────────
 
 variable "project_name" {
-  description = "Prefix applied to network resource naming"
+  description = "Prefix for resource naming"
   type        = string
 }
 
-variable "vpc_cidr" {
-  description = "Allocated IP range for the VPC architecture"
+variable "instance_type" {
+  description = "EC2 instance size"
   type        = string
-  default     = "10.0.0.0/16"
+  default     = "t3.small"
 }
 
-variable "public_subnet_cidr" {
-  description = "Allocated IP range for the primary public subnet segment"
+variable "subnet_id" {
+  description = "ID of the target subnet for instance placement"
   type        = string
-  default     = "10.0.1.0/24"
 }
 
-variable "aws_region" {
-  description = "AWS region designation for subnet availability zone mapping"
+variable "security_group_id" {
+  description = "ID of the security group to attach to the instance"
   type        = string
 }

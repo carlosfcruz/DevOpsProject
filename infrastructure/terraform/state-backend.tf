@@ -1,16 +1,16 @@
 # ─────────────────────────────────────────────────────────
 # State Backend Resources
 # ─────────────────────────────────────────────────────────
-# These create the S3 bucket and DynamoDB table that will
-# store Terraform state remotely (we'll migrate in Session 6).
+# Provisions the S3 bucket and DynamoDB table necessary for
+# remote state storage and locking mechanisms.
 #
-# WHY remote state?
-#   - Local .tfstate = single point of failure on your laptop
-#   - S3 = versioned, durable, shared with your team
-#   - DynamoDB = prevents two people from applying at once
+# Remote state provides:
+#   - Durability and versioning (S3)
+#   - Concurrency control and state locking (DynamoDB)
 # ─────────────────────────────────────────────────────────
 
-# ───── S3 Bucket: stores the terraform.tfstate file ─────
+# ───── S3 Bucket ─────
+# Stores the terraform.tfstate file remotely.
 resource "aws_s3_bucket" "terraform_state" {
   bucket = "platform-terraform-state-${data.aws_caller_identity.current.account_id}"
 
@@ -20,7 +20,7 @@ resource "aws_s3_bucket" "terraform_state" {
   }
 }
 
-# Enable versioning — so you can roll back bad state
+# Enables object versioning for state history and rollback capability.
 resource "aws_s3_bucket_versioning" "terraform_state" {
   bucket = aws_s3_bucket.terraform_state.id
 
@@ -29,7 +29,7 @@ resource "aws_s3_bucket_versioning" "terraform_state" {
   }
 }
 
-# Encrypt state at rest (it may contain secrets)
+# Configures default encryption at rest using AES256.
 resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state" {
   bucket = aws_s3_bucket.terraform_state.id
 
@@ -40,7 +40,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state" 
   }
 }
 
-# Block all public access — state files are private
+# Enforces strict block of public access for the state bucket.
 resource "aws_s3_bucket_public_access_block" "terraform_state" {
   bucket = aws_s3_bucket.terraform_state.id
 
@@ -50,9 +50,9 @@ resource "aws_s3_bucket_public_access_block" "terraform_state" {
   restrict_public_buckets = true
 }
 
-# ───── DynamoDB Table: state locking ─────
-# When someone runs `terraform apply`, this table locks
-# the state so nobody else can apply at the same time.
+# ───── DynamoDB Table ─────
+# Facilitates state locking during concurrent apply operations
+# to prevent state corruption.
 resource "aws_dynamodb_table" "terraform_locks" {
   name         = "platform-terraform-locks"
   billing_mode = "PAY_PER_REQUEST"
@@ -69,6 +69,7 @@ resource "aws_dynamodb_table" "terraform_locks" {
   }
 }
 
-# ───── Data source: get current AWS account ID ─────
-# Used to make the S3 bucket name globally unique
+# ───── Identity Data Source ─────
+# Retrieves the operational AWS account ID to ensure global 
+# uniqueness for the S3 bucket name.
 data "aws_caller_identity" "current" {}
