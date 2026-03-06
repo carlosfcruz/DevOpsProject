@@ -1,0 +1,39 @@
+# ─────────────────────────────────────────────────────────
+# Playbook: Server Connectivity Test
+# ─────────────────────────────────────────────────────────
+# Verifies SSH connectivity to target hosts and validates
+# that basic system operations (apt update) execute correctly.
+# ─────────────────────────────────────────────────────────
+
+---
+- name: Verify server connectivity and system readiness
+  hosts: app_servers
+  become: true
+
+  tasks:
+    - name: Verify SSH connectivity via ping module
+      ansible.builtin.ping:
+
+    - name: Display remote hostname
+      ansible.builtin.command: hostname
+      register: hostname_result
+      changed_when: false
+
+    - name: Print hostname
+      ansible.builtin.debug:
+        msg: "Connected to: {{ hostname_result.stdout }}"
+
+    - name: Update apt package cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install essential system packages
+      ansible.builtin.apt:
+        name:
+          - curl
+          - wget
+          - git
+          - htop
+          - unzip
+        state: present
