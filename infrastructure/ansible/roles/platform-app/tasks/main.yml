@@ -1,0 +1,30 @@
+---
+- name: Ensure application namespace exists
+  kubernetes.core.k8s:
+    name: "{{ app_namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+
+- name: Create database credentials secret
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: db-credentials
+        namespace: "{{ app_namespace }}"
+      type: Opaque
+      stringData:
+        postgres-password: "supersecurepassword"
+        postgres-user: "platform"
+  no_log: true
+
+- name: Deploy ArgoCD Application manifest from template
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    template: 'argocd-app.yml.j2'
