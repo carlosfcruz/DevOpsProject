@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────
-# OpsPilot — Terraform Root Module
+# Platform — Terraform Root Module
 # ─────────────────────────────────────────────────────────
 # This file is the entry point for all infrastructure.
 # Right now it only configures the AWS provider.
@@ -33,7 +33,7 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Project     = "OpsPilot"
+      Project     = "Platform"
       ManagedBy   = "Terraform"
       Environment = "staging"
     }
