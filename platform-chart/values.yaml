@@ -3,7 +3,7 @@ api:
   replicas: 2
   image:
     repository: ghcr.io/carlosfcruz/devopsproject
-    tag: be64cf000f1d17b75c8e7d3f91f45a19391f3abd
+    tag: 2be06e3b9ebc2a53db5bf0c51316034105f7ea6f
   port: 8000
   env:
     APP_NAME: "platform"
