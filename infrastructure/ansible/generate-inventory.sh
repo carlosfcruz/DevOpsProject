@@ -17,6 +17,7 @@ KEY_FILE="platform-key.pem"
 echo "Retrieving Terraform outputs..."
 
 SERVER_IP=$(terraform -chdir="$TERRAFORM_DIR" output -raw server_public_ip)
+rm -f "$KEY_FILE"
 terraform -chdir="$TERRAFORM_DIR" output -raw private_key_pem > "$KEY_FILE"
 chmod 400 "$KEY_FILE"
 
