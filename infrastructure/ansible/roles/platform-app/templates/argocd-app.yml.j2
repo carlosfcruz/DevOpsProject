@@ -1,9 +1,9 @@
 # ─────────────────────────────────────────────────────────
 # ArgoCD Application Manifest Template
 # ─────────────────────────────────────────────────────────
-# This template defines the GitOps synchronization parameters
-# for the platform application. It uses Jinja2 templating
-# notation to dynamically inject the target server IP into 
+# Dynamic parameters configuration for GitOps synchronization.
+# Depends on Jinja2 templating for inventory hostname injection
+# into Helm values.
 # the Helm values.
 # ─────────────────────────────────────────────────────────
 
@@ -22,12 +22,8 @@ spec:
       values: |
         ingress:
           enabled: true
-          hosts:
-            # We inject the Ansible inventory hostname (the EC2 public IP)
-            - host: {{ inventory_hostname }}.nip.io
-              paths:
-                - path: /
-                  pathType: Prefix
+          className: traefik
+          host: {{ inventory_hostname }}.nip.io
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: '{{ app_namespace }}'
