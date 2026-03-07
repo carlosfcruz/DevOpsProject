@@ -9,10 +9,20 @@
 - name: Provision Kubernetes Cluster and Platform Application
   hosts: app_servers
   become: true
+  gather_facts: false
 
   vars:
     github_repo_url: "https://github.com/carlosfcruz/DevOpsProject.git"
     app_namespace: "platform-cloud"
+
+  pre_tasks:
+    - name: Wait for SSH to become available
+      ansible.builtin.wait_for_connection:
+        delay: 10
+        timeout: 300
+
+    - name: Gather facts after connection is ready
+      ansible.builtin.setup:
 
   roles:
     - role: k3s
