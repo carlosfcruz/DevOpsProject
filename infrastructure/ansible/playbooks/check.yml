@@ -1,0 +1,32 @@
+---
+- name: Diagnose ArgoCD and Ingress Status
+  hosts: app_servers
+  become: true
+  tasks:
+    - name: Get ArgoCD Application status
+      kubernetes.core.k8s_info:
+        api_version: argoproj.io/v1alpha1
+        kind: Application
+        name: platform-app
+        namespace: argocd
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+      register: app_status
+
+    - name: Debug ArgoCD Sync Status
+      ansible.builtin.debug:
+        msg: >
+          Sync Status: {{ app_status.resources[0].status.sync.status | default('Unknown') }},
+          Health: {{ app_status.resources[0].status.health.status | default('Unknown') }},
+          Message: {{ app_status.resources[0].status.conditions[0].message | default('No error details') }}
+
+    - name: Get Ingress Status
+      kubernetes.core.k8s_info:
+        api_version: networking.k8s.io/v1
+        kind: Ingress
+        namespace: platform-cloud
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+      register: ingress_status
+
+    - name: Debug Ingress Status
+      ansible.builtin.debug:
+        msg: "Ingress Resources: {{ ingress_status.resources | length }}"
