@@ -14,7 +14,7 @@ terraform {
       version = "~> 5.0"
     }
   }
-
+  /*
   backend "s3" {
     bucket       = "platform-terraform-state-849265223774"
     key          = "platform/terraform.tfstate"
@@ -22,6 +22,7 @@ terraform {
     use_lockfile = true
     encrypt      = true
   }
+  */
 }
 
 # ─────────────────────────────────────────────────────────
