@@ -30,3 +30,19 @@
     - name: Debug Ingress Status
       ansible.builtin.debug:
         msg: "Ingress Resources: {{ ingress_status.resources | length }}"
+
+    - name: Get Pods Status
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Pod
+        namespace: platform-cloud
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+      register: pods_status
+
+    - name: Debug Pods Status
+      ansible.builtin.debug:
+        msg: >
+          Pod: {{ item.metadata.name }} 
+          Phase: {{ item.status.phase }} 
+          Reason: {{ (item.status.containerStatuses | default([])) | map(attribute='state.waiting.reason') | list | default('Running', true) }}
+      loop: "{{ pods_status.resources }}"
