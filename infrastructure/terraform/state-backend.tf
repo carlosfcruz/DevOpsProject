@@ -12,7 +12,8 @@
 # ───── S3 Bucket ─────
 # Stores the terraform.tfstate file remotely.
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = "platform-terraform-state-${data.aws_caller_identity.current.account_id}"
+  bucket        = "platform-terraform-state-${data.aws_caller_identity.current.account_id}"
+  force_destroy = true
 
   tags = {
     Name    = "Terraform State"
