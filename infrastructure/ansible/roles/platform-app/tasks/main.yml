@@ -19,8 +19,9 @@
         namespace: "{{ app_namespace }}"
       type: Opaque
       stringData:
-        postgres-password: "supersecurepassword"
-        postgres-user: "platform"
+        POSTGRES_PASSWORD: "{{ postgres_password }}"
+        POSTGRES_USER: "{{ postgres_user }}"
+        POSTGRES_DB: "{{ postgres_db }}"
   no_log: true
 
 - name: Deploy ArgoCD Application manifest from template

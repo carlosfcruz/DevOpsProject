@@ -46,9 +46,16 @@ echo "[1/2] Generating dynamic SSH inventory..."
 chmod +x generate-inventory.sh
 ./generate-inventory.sh
 
-echo "[2/2] Executing main sequence playbook (site.yml)..."
+echo "[2/3] Generating secure database credentials..."
+# Use environment variables if set (e.g., from CI secrets), otherwise generate securely
+export DB_USER=${DB_USER:-"platform"}
+export DB_NAME=${DB_NAME:-"platform"}
+export DB_PASSWORD=${DB_PASSWORD:-$(openssl rand -base64 16 | tr -dc 'a-zA-Z0-9' | head -c 16)}
+
+echo "[3/3] Executing main sequence playbook (site.yml)..."
 # Setting ANSIBLE_HOST_KEY_CHECKING=False as a fallback environment variable
-ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook playbooks/site.yml
+ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook playbooks/site.yml \
+  --extra-vars "postgres_user=$DB_USER postgres_db=$DB_NAME postgres_password=$DB_PASSWORD"
 
 # ─── 3. Final Verification ───
 echo ""
