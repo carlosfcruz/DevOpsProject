@@ -30,3 +30,6 @@
     name: kubernetes
     state: present
     executable: pip3
+
+- name: Force handlers to run immediately
+  ansible.builtin.meta: flush_handlers
